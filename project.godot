@@ -1,0 +1,46 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "AnimationPlayer",
+"class": "BackgroundManager",
+"language": "GDScript",
+"path": "res://Music/BackgroundManager.gd"
+}, {
+"base": "AnimationPlayer",
+"class": "SoundManager",
+"language": "GDScript",
+"path": "res://Music/SoundManager.gd"
+}, {
+"base": "Resource",
+"class": "SoundResource",
+"language": "GDScript",
+"path": "res://Music/SoundResource.gd"
+} ]
+_global_script_class_icons={
+"BackgroundManager": "",
+"SoundManager": "",
+"SoundResource": ""
+}
+
+[application]
+
+config/name="CS 4700 Pong"
+run/main_scene="res://MainMenu.tscn"
+config/icon="res://icon.png"
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+environment/default_clear_color=Color( 0, 0, 0, 1 )
+environment/default_environment="res://default_env.tres"
