@@ -13,12 +13,17 @@ onready var menu = $MainMenu
 var ball
 var player
 var computer
+var bonus
 var player_score = 0
 var computer_score = 0
-var winning_score = 5
+var winning_score = 10
 var initial_velocity_x = 600
 var initial_velocity_y = 100
 var computer_velocity_y = 300
+var bonus_added = false
+var ball_direction = 0
+
+var rand = RandomNumberGenerator.new()
 
 var score1 = 0 setget set_score1
 var score2 = 0 setget set_score2
@@ -46,6 +51,10 @@ func _ready():
 	computer = get_node('computer')
 	ball = get_node('ball')
 	print('variant')
+	
+	rand.randomize()
+	
+	connect('body_entered', bonus, 'on_bonus_body_entered')
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -75,11 +84,22 @@ func _process(delta):
 	if ball.position.x < 0:
 		soundManager.playWinPoint()
 		reset_position()
-		self.score2 += 1.0		
+		self.score2 += 1.0
+	
+	# add bonus when one player is halfway to winning
+	if (bonus_added == false) and ((self.score1 >= winning_score / 2) or (self.score2 >= winning_score / 2)):
+		bonus_added = true
+		bonus = get_node('bonus')
+		bonus.visible = true
+		bonus.position.x = 512
+		bonus.position.y = rand.randi_range(50, 462)
+		print('bonus added')
+		print(bonus.position.y)
 		
 	if self.score1 >= winning_score or self.score2 >= winning_score:
 		self.score1 = 0
 		self.score2 = 0
+		
 	
 func reset_position():
 	Physics2DServer.body_set_state(
@@ -87,6 +107,18 @@ func reset_position():
 		Physics2DServer.BODY_STATE_TRANSFORM,
 		Transform2D.IDENTITY.translated(Vector2(512, 300))
 	)
-	ball.linear_velocity.x = initial_velocity_x
-	ball.linear_velocity.y = initial_velocity_y
-
+	ball_direction = rand.randi_range(0, 1)
+	if ball_direction == 0:
+		ball.linear_velocity.x = initial_velocity_x
+		ball.linear_velocity.y = initial_velocity_y	
+	else:
+		ball.linear_velocity.x = -initial_velocity_x
+		ball.linear_velocity.y = -initial_velocity_y	
+	
+func on_bonus_body_entered():
+	print('bonus collided with')
+	if ball.linear_velocity.x > 0:
+		self.score1 += 1.0
+	else:
+		self.score2 += 1.0
+	remove_child(bonus)

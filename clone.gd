@@ -8,10 +8,12 @@ var player
 var computer
 var player_score = 0
 var computer_score = 0
-var winning_score = 5
 var initial_velocity_x = 600
 var initial_velocity_y = 100
 var computer_velocity_y = 300
+var ball_direction = 0
+
+var rand = RandomNumberGenerator.new()
 
 var score1 = 0 setget set_score1
 var score2 = 0 setget set_score2
@@ -30,6 +32,8 @@ func _ready():
 	computer = get_node('computer')
 	ball = get_node('ball')
 	print('clone')
+	
+	rand.randomize()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -53,10 +57,6 @@ func _process(delta):
 	if ball.position.x < 0:
 		reset_position()
 		self.score2 += 1.0		
-		
-	if self.score1 >= winning_score or self.score2 >= winning_score:
-		self.score1 = 0
-		self.score2 = 0
 	
 func reset_position():
 	Physics2DServer.body_set_state(
@@ -64,5 +64,10 @@ func reset_position():
 		Physics2DServer.BODY_STATE_TRANSFORM,
 		Transform2D.IDENTITY.translated(Vector2(512, 300))
 	)
-	ball.linear_velocity.x = initial_velocity_x
-	ball.linear_velocity.y = initial_velocity_y
+	ball_direction = rand.randi_range(0, 1)
+	if ball_direction == 0:
+		ball.linear_velocity.x = initial_velocity_x
+		ball.linear_velocity.y = initial_velocity_y	
+	else:
+		ball.linear_velocity.x = -initial_velocity_x
+		ball.linear_velocity.y = -initial_velocity_y
