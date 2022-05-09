@@ -1,5 +1,7 @@
 extends Node2D
 
+var current_scene = null
+
 # sound maker
 var backgroundStream: AudioStreamPlayer = AudioStreamPlayer.new()
 var backgroundManager: BackgroundManager = BackgroundManager.new()
@@ -16,7 +18,7 @@ var computer
 var bonus
 var player_score = 0
 var computer_score = 0
-var winning_score = 10
+var winning_score = 5
 var initial_velocity_x = 600
 var initial_velocity_y = 100
 var computer_velocity_y = 300
@@ -39,6 +41,8 @@ func set_score2(new_score2):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	current_scene = get_tree().get_root().get_child(get_tree().get_root().get_child_count() - 1)
+	
 	backgroundStream.name = "BackgroundStream"
 	backgroundStream.add_child(backgroundManager)
 	add_child(backgroundStream)
@@ -56,6 +60,11 @@ func _ready():
 	
 	connect('body_entered', bonus, 'on_bonus_body_entered')
 
+func setScene(scene):
+	current_scene.queue_free()
+	var s = ResourceLoader.load(scene)
+	current_scene = s.instance()
+	get_tree().get_root().add_child(current_scene)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -79,12 +88,12 @@ func _process(delta):
 	if ball.position.x > 1024:
 		soundManager.playLosePoint()
 		reset_position()		
-		self.score1 += 1.0
+		self.score1 += 0.25
 		
 	if ball.position.x < 0:
 		soundManager.playWinPoint()
 		reset_position()
-		self.score2 += 1.0
+		self.score2 += 0.25
 	
 	# add bonus when one player is halfway to winning
 	if (bonus_added == false) and ((self.score1 >= winning_score / 2) or (self.score2 >= winning_score / 2)):
@@ -96,9 +105,11 @@ func _process(delta):
 		print('bonus added')
 		print(bonus.position.y)
 		
-	if self.score1 >= winning_score or self.score2 >= winning_score:
-		self.score1 = 0
-		self.score2 = 0
+	if self.score1 >= winning_score:	
+		# Remove the current level
+		setScene('res://compWin.tscn')
+	elif self.score2 >= winning_score:
+		setScene('res://playerWin.tscn')
 		
 	
 func reset_position():
