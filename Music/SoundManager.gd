@@ -17,11 +17,16 @@ var losePointFile: Resource = preload("res://Music/LosePoint.wav")
 var losePointLength: float = losePointFile.get_length()
 var losePointName: String = "LosePoint"
 
+var selectionFile: Resource = preload("res://Music/Selection.wav")
+var selectionLength: float = selectionFile.get_length()
+var selectionName: String = "Selection"
+
 func _ready() -> void:
 	self.name = "SoundManager"
 	self.add_animation(bounceName, sounds.createSound(bounceFile, streamPlayer, bounceLength))
 	self.add_animation(winPointName, sounds.createSound(winPointFile, streamPlayer, winPointLength))
 	self.add_animation(losePointName, sounds.createSound(losePointFile, streamPlayer, losePointLength))
+	self.add_animation(selectionName, sounds.createSound(selectionFile, streamPlayer, selectionLength))
 
 
 func playBounce() -> void:
@@ -32,6 +37,9 @@ func playWinPoint() -> void:
 
 func playLosePoint() -> void:
 	self.play(losePointName)
+
+func playSelection() -> void:
+	self.play(selectionName)
 
 
 """

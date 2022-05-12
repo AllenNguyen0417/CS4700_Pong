@@ -5,7 +5,6 @@
 [ext_resource path="res://Assets/ball.png" type="Texture" id=3]
 [ext_resource path="res://HUD.tscn" type="PackedScene" id=4]
 [ext_resource path="res://variant.gd" type="Script" id=5]
-[ext_resource path="res://Assets/fancy-paddle-green.png" type="Texture" id=6]
 
 [sub_resource type="PhysicsMaterial" id=1]
 
@@ -32,8 +31,11 @@ height = 8.0
 
 [sub_resource type="RectangleShape2D" id=10]
 
-[sub_resource type="RectangleShape2D" id=11]
-extents = Vector2( 10, 38 )
+[sub_resource type="Curve" id=11]
+_data = [ Vector2( 0.00746268, 0.969096 ), 0.0, 0.0, 0, 0, Vector2( 0.701493, 0.832732 ), 0.0, 0.0, 0, 0, Vector2( 0.977612, 0 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="RectangleShape2D" id=12]
+extents = Vector2( 7, 40 )
 
 [node name="variant" type="Node2D"]
 script = ExtResource( 5 )
@@ -111,14 +113,90 @@ shape = SubResource( 10 )
 
 [node name="HUD" parent="." instance=ExtResource( 4 )]
 
-[node name="bonus" type="RigidBody2D" parent="."]
-visible = false
+[node name="particles" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 100
+lifetime = 0.5
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 4.0
+spread = 180.0
+initial_velocity = 200.0
+initial_velocity_random = 1.0
+scale_amount = 4.0
+scale_amount_curve = SubResource( 11 )
+
+[node name="left_score_particles" type="CPUParticles2D" parent="."]
+position = Vector2( 170, 90 )
+emitting = false
+amount = 100
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 4.0
+spread = 180.0
+initial_velocity = 175.0
+initial_velocity_random = 1.0
+scale_amount = 4.0
+scale_amount_curve = SubResource( 11 )
+color = Color( 0.12549, 0.701961, 0.792157, 1 )
+
+[node name="right_score_particles" type="CPUParticles2D" parent="."]
+position = Vector2( 854, 90 )
+emitting = false
+amount = 100
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 4.0
+spread = 180.0
+initial_velocity = 175.0
+initial_velocity_random = 1.0
+scale_amount = 4.0
+scale_amount_curve = SubResource( 11 )
+color = Color( 0.12549, 0.701961, 0.792157, 1 )
+
+[node name="left_block" type="RigidBody2D" parent="."]
+z_index = 1
+mode = 1
+physics_material_override = SubResource( 1 )
+gravity_scale = 0.0
+
+[node name="Sprite" type="Sprite" parent="left_block"]
+rotation = 1.5708
+scale = Vector2( 0.1, 0.05 )
+texture = ExtResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="left_block"]
+position = Vector2( -1, 0 )
+shape = SubResource( 2 )
+
+[node name="Area2D" type="Area2D" parent="left_block"]
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="left_block/Area2D"]
+shape = SubResource( 12 )
+
+[node name="right_block" type="RigidBody2D" parent="."]
+z_index = 1
+collision_mask = 2
+mode = 1
+physics_material_override = SubResource( 1 )
+gravity_scale = 0.0
 contacts_reported = 5
 contact_monitor = true
 
-[node name="Sprite" type="Sprite" parent="bonus"]
-scale = Vector2( 0.6, 0.6 )
-texture = ExtResource( 6 )
+[node name="Sprite" type="Sprite" parent="right_block"]
+rotation = 1.5708
+scale = Vector2( 0.1, 0.05 )
+texture = ExtResource( 1 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="bonus"]
-shape = SubResource( 11 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="right_block"]
+position = Vector2( -1, 0 )
+shape = SubResource( 2 )
+
+[node name="Area2D" type="Area2D" parent="right_block"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="right_block/Area2D"]
+shape = SubResource( 12 )
+
+[connection signal="body_entered" from="left_block/Area2D" to="." method="_on_Area2D_body_entered"]
+[connection signal="body_entered" from="right_block/Area2D" to="." method="_on_Area2D_body_entered"]
